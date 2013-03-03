@@ -1,0 +1,9 @@
+development:
+    driver: postgres
+    open: user=weightlog dbname=weightlog sslmode=disable password=weightlog
+test:
+    driver: postgres
+    open: user=weightlog dbname=weightlog_test sslmode=disable password=weightlog
+production:
+	driver: postgres
+	open: $DATABASE_URL
