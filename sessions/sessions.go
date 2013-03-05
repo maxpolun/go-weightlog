@@ -1,8 +1,8 @@
 package sessions
 
 import (
+	"../util"
 	"crypto/rand"
-	"database/sql"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -15,12 +15,6 @@ type Session struct {
 	Id        []byte
 	UserId    int64
 	CreatedAt time.Time
-}
-
-type DB interface {
-	Exec(query string, args ...interface{}) (sql.Result, error)
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-	QueryRow(query string, args ...interface{}) *sql.Row
 }
 
 func New(uid int64) (s *Session, err error) {
@@ -42,7 +36,7 @@ func encodeBase64(in []byte) []byte {
 	base64.StdEncoding.Encode(out, in)
 	return out
 }
-func (s *Session) Save(db DB) error {
+func (s *Session) Save(db util.DB) error {
 	_, err := db.Exec("INSERT INTO sessions (id, user_id) VALUES ($1, $2);", s.Id, s.UserId)
 	return err
 }

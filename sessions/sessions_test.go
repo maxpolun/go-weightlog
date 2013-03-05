@@ -2,21 +2,16 @@ package sessions
 
 import (
 	"../users"
+	"../util"
 	"bytes"
 	"database/sql"
-	_ "github.com/bmizerany/pq"
-	"log"
 	"testing"
 )
 
 var db *sql.DB
 
 func init() {
-	var err error
-	db, err = sql.Open("postgres", "user=weightlog dbname=weightlog_test password=weightlog sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
+	db = util.GetTestDb()
 }
 
 func TestNewSessionWorks(t *testing.T) {

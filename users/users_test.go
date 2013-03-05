@@ -1,27 +1,23 @@
 package users
 
 import (
+	"../util"
 	"bytes"
 	"database/sql"
-	_ "github.com/bmizerany/pq"
 	"github.com/jameskeane/bcrypt"
-	"log"
 	"testing"
 )
 
 var db *sql.DB
 
 func init() {
-	var err error
-	db, err = sql.Open("postgres", "user=weightlog dbname=weightlog_test password=weightlog sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
+	db = util.GetTestDb()
 }
 
 func TestGetByEmailExists(t *testing.T) {
 	t.Parallel()
 	txn, _ := db.Begin()
+	defer txn.Rollback()
 	txn.Exec("INSERT INTO users (email, pw_hash) VALUES ('test@test.com','randomjunk');")
 	user, err := GetByEmail(txn, "test@test.com")
 	if err != nil {
@@ -30,7 +26,7 @@ func TestGetByEmailExists(t *testing.T) {
 	if user.Email != "test@test.com" {
 		t.Errorf("expected 'test@test.com' when using GetByEmail, got %v instead", user.Email)
 	}
-	txn.Rollback()
+
 }
 func TestGetByEmailDoesNotExist(t *testing.T) {
 	t.Parallel()
@@ -64,6 +60,7 @@ func TestVerifyIncorrect(t *testing.T) {
 func TestSave(t *testing.T) {
 	t.Parallel()
 	txn, _ := db.Begin()
+	defer txn.Rollback()
 	u := &User{
 		Email:  "test@test.com",
 		PwHash: []byte("randomjunk")}
@@ -83,11 +80,12 @@ func TestSave(t *testing.T) {
 			u.PwHash,
 			hash)
 	}
-	txn.Rollback()
+
 }
 func TestSaveAlreadyExists(t *testing.T) {
 	t.Parallel()
 	txn, _ := db.Begin()
+	defer txn.Rollback()
 	u := &User{
 		Email:  "test@test.com",
 		PwHash: []byte("randomjunk")}
