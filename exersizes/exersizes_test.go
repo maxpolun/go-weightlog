@@ -41,6 +41,8 @@ func TestGetAll(t *testing.T) {
 	txn, _ := db.Begin()
 	defer txn.Rollback()
 
+	txn.Exec("TRUNCATE exersizes CASCADE;")
+
 	es := []*Exersize{
 		&Exersize{Name: "squats"},
 		&Exersize{Name: "press"},
