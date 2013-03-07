@@ -3,30 +3,12 @@ package main
 import (
 	"./sessions"
 	"./users"
-	"database/sql"
+	"./util"
 	"fmt"
-	_ "github.com/bmizerany/pq"
 	"log"
 	"net/http"
 	"os"
 )
-
-var db_url string
-
-func init() {
-	db_url = os.Getenv("DATABASE_URL")
-	if db_url == "" {
-		db_url = "user=weightlog dbname=weightlog password=weightlog sslmode=disable"
-	}
-}
-
-func getDB() *sql.DB {
-	db, err := sql.Open("postgres", db_url)
-	if err != nil {
-		panic(err)
-	}
-	return db
-}
 
 func setJSON(rw http.ResponseWriter) {
 	header := rw.Header()
@@ -47,7 +29,7 @@ func loginHandler(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "{errors:[\"no_username_password\"]}", 400)
 		return
 	}
-	db := getDB()
+	db := util.GetDB()
 	defer db.Close()
 	u, err := users.GetByEmail(db, email)
 	if err != nil {
@@ -86,7 +68,7 @@ func registerHandler(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "{errors:[\"hash_error\"]}", 500)
 		return
 	}
-	db := getDB()
+	db := util.GetDB()
 	defer db.Close()
 	err = user.Save(db)
 	if err != nil {
