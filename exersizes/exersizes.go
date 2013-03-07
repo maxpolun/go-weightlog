@@ -31,3 +31,20 @@ func (e *Exersize) Save(db util.DB) error {
 	e.Id = e2.Id
 	return nil
 }
+
+func GetAll(db util.DB) ([]*Exersize, error) {
+	rows, err := db.Query("SELECT id, name FROM exersizes;")
+	if err != nil {
+		return nil, err
+	}
+	es := make([]*Exersize, 0, 10)
+	for rows.Next() {
+		e := &Exersize{}
+		err := rows.Scan(&e.Id, &e.Name)
+		if err != nil {
+			return nil, err
+		}
+		es = append(es, e)
+	}
+	return es, nil
+}
