@@ -5,6 +5,7 @@ import (
 	"./users"
 	"./util"
 	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
@@ -79,9 +80,10 @@ func registerHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", rootHandler)
-	http.HandleFunc("/login", loginHandler)
-	http.HandleFunc("/register", registerHandler)
+	router := mux.NewRouter()
+	router.HandleFunc("/", rootHandler).Methods("GET").Name("root")
+	router.HandleFunc("/login", loginHandler).Methods("POST").Name("login")
+	router.HandleFunc("/register", registerHandler).Methods("POST").Name("register")
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = ":8080"
@@ -89,5 +91,6 @@ func main() {
 		port = ":" + port
 	}
 	log.Printf("starting api server on port %v", port)
+	http.Handle("/", router)
 	log.Fatal(http.ListenAndServe(port, nil))
 }
