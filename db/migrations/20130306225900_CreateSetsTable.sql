@@ -6,7 +6,7 @@ CREATE TYPE weight_unit AS ENUM ('lb', 'kg');
 CREATE TABLE sets (
 	id SERIAL PRIMARY KEY,
 	completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	exersize_id SERIAL REFERENCES exersizes(id),
+	exersize varchar(128) REFERENCES exersizes(name),
 	reps INTEGER NOT NULL,
 	user_id SERIAL REFERENCES users(id),
 	notes TEXT,
@@ -17,3 +17,4 @@ CREATE TABLE sets (
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
 DROP TABLE sets;
+DROP TYPE weight_unit;

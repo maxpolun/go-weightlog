@@ -19,9 +19,17 @@ var ErrUserDoesNotExist error = errors.New("User does not exist")
 func GetByEmail(db util.DB, email string) (u *User, err error) {
 	row := db.QueryRow("SELECT id, email, pw_hash FROM users WHERE email = $1;", email)
 
-	if row == nil {
-		return nil, ErrUserDoesNotExist
+	u = &User{}
+	err = row.Scan(&u.Id, &u.Email, &u.PwHash)
+	if err != nil {
+		return nil, err
 	}
+	u.saved = true
+	return u, nil
+}
+func GetById(db util.DB, id int64) (u *User, err error) {
+	row := db.QueryRow("SELECT id, email, pw_hash FROM users WHERE id = $1;", id)
+
 	u = &User{}
 	err = row.Scan(&u.Id, &u.Email, &u.PwHash)
 	if err != nil {

@@ -31,10 +31,15 @@ func GetTestDb() *sql.DB {
 	return db
 }
 
-func GetDB() *sql.DB {
+func GetDb() *sql.DB {
 	db, err := sql.Open("postgres", db_url)
 	if err != nil {
 		panic(err)
 	}
 	return db
+}
+func GetLastId(db DB, tablename string) (id int64, err error) {
+	row := db.QueryRow("SELECT currval(pg_get_serial_sequence($1, 'id'));", tablename)
+	err = row.Scan(&id)
+	return
 }

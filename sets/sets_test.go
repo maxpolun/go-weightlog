@@ -1,7 +1,6 @@
 package sets
 
 import (
-	"../exersizes"
 	"../users"
 	"../util"
 	"testing"
@@ -11,29 +10,25 @@ func TestSaveWorks(t *testing.T) {
 	db := util.GetTestDb()
 	txn, _ := db.Begin()
 	defer txn.Rollback()
-	e, err := exersizes.GetByName("squat", db)
-	if err != nil {
-		t.Errorf("Error getting exersize:", err)
-	}
 	u, err := users.New("test@test.com", "password123")
 	err = u.Save(txn)
 	if err != nil {
 		t.Errorf("Error saving user:", err)
 	}
 
-	set := New(e.Id, 5, u.Id, 250, "lb")
+	set := New("squat", 5, u.Id, 250, "lb")
 	err = set.Save(txn)
 	if err != nil {
 		t.Errorf("error saving set: %v", err)
 	}
-	row := txn.QueryRow("SELECT id, completed_at, exersize_id, reps, user_id, weight, unit, notes FROM sets WHERE id=$1;",
+	row := txn.QueryRow("SELECT id, completed_at, exersize, reps, user_id, weight, unit, notes FROM sets WHERE id=$1;",
 		set.Id)
 	set2 := new(Set)
-	err = row.Scan(&set2.Id, &set2.CompletedAt, &set2.ExersizeId, &set2.Reps, &set2.UserId, &set2.Weight, &set2.Unit, &set2.Notes)
+	err = row.Scan(&set2.Id, &set2.CompletedAt, &set2.Exersize, &set2.Reps, &set2.UserId, &set2.Weight, &set2.Unit, &set2.Notes)
 	if err != nil {
 		t.Errorf("error scanning set: %v", err)
 	}
-	if set.Id != set2.Id || set.ExersizeId != set2.ExersizeId || set.Reps != set2.Reps || set.Weight != set2.Weight || set.Unit != set2.Unit {
+	if set.Id != set2.Id || set.Exersize != set2.Exersize || set.Reps != set2.Reps || set.Weight != set2.Weight || set.Unit != set2.Unit {
 		t.Errorf("returned set does not equal expected set: expected %v, got %v", set, set2)
 	}
 }
@@ -47,17 +42,15 @@ func TestGetByUserId(t *testing.T) {
 	user2, _ := users.New("test2@example.com", "testpassword")
 	user2.Save(txn)
 
-	e, err := exersizes.GetByName("squat", txn)
-
 	for i := 0; i < 10; i++ {
-		s := New(e.Id, 5, user1.Id, 50, "lb")
+		s := New("squat", 5, user1.Id, 50, "lb")
 		err := s.Save(txn)
 		if err != nil {
 			t.Errorf("got error saving set:%v", err)
 		}
 	}
-	s := New(e.Id, 5, user2.Id, 50, "lb")
-	err = s.Save(txn)
+	s := New("squat", 5, user2.Id, 50, "lb")
+	err := s.Save(txn)
 	if err != nil {
 		t.Errorf("got error saving set:%v", err)
 	}

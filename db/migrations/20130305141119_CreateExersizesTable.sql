@@ -1,8 +1,7 @@
 -- +goose Up
 -- SQL in section 'Up' is executed when this migration is applied
 CREATE TABLE exersizes (
-	id SERIAL PRIMARY KEY,
-	name VARCHAR(150)
+	name VARCHAR(128) PRIMARY KEY
 );
 
 -- +goose Down
